@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Catatan Bersama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F4EFE1;
+    --paper-deep: #EAE1C7;
+    --ink: #241F18;
+    --ink-soft: #6B6152;
+    --wine: #7A2430;
+    --wine-soft: #A9636C;
+    --moss: #4B5842;
+    --rule: #D9CFB3;
+    --radius: 3px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lora', serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  a, button{ font-family: inherit; }
+
+  .page{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: clamp(20px, 4vw, 56px) clamp(18px, 5vw, 48px) 80px;
+  }
+
+  header.masthead{
+    display:flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+  header.masthead h1{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: clamp(28px, 4vw, 38px);
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+  .meta{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .room-code{
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1.5px;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--rule);
+    padding-bottom: 1px;
+  }
+  .status{
+    display:flex; align-items:center; gap:7px;
+  }
+  .status .dot{
+    width:7px; height:7px; border-radius:50%;
+    background: var(--moss);
+    box-shadow: 0 0 0 3px rgba(75,88,66,0.15);
+  }
+  .status.offline .dot{ background: var(--wine-soft); box-shadow: 0 0 0 3px rgba(169,99,108,0.15); }
+
+  .spread{
+    display:grid;
+    grid-template-columns: 1.1fr 1px 0.9fr;
+    gap: clamp(20px, 4vw, 44px);
+    margin-top: 36px;
+    align-items: start;
+  }
+  .spine{
+    background: var(--rule);
+    align-self: stretch;
+    min-height: 100%;
+  }
+
+  h2.section-title{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  .count{
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  textarea{
+    width: 100%;
+    min-height: 190px;
+    resize: vertical;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 4px 2px 14px;
+    font-family: 'Lora', serif;
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--ink);
+    outline: none;
+  }
+  textarea::placeholder{ color: #B4A98F; font-style: italic; }
+  textarea:focus{ border-bottom-color: var(--wine-soft); }
+
+  .compose-foot{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    margin-top: 14px;
+    gap: 12px;
+  }
+  .char-count{ font-size: 13px; color: var(--ink-soft); }
+
+  button.send{
+    background: var(--wine);
+    color: var(--paper);
+    border: none;
+    padding: 10px 22px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+  button.send:hover{ background: #612029; }
+  button.send:active{ transform: translateY(1px); }
+
+  .device-picker{
+    display:flex; gap: 14px; margin-top: 12px;
+    font-size: 13px; color: var(--ink-soft);
+  }
+  .device-picker label{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .device-picker input{ accent-color: var(--wine); }
+
+  ul.history{
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  li.entry{
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    animation: settle 320ms ease;
+  }
+  li.entry:first-child{ padding-top: 0; }
+  @keyframes settle{
+    from{ opacity:0; transform: translateY(-4px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .entry-top{
+    display:flex; justify-content: space-between; align-items:baseline;
+    font-size: 12.5px; color: var(--ink-soft); margin-bottom: 6px;
+  }
+  .entry-top .from{ font-style: italic; }
+  .entry-text{
+    font-size: 15.5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0 0 8px;
+  }
+  .entry-actions{
+    display:flex; gap: 16px;
+  }
+  .entry-actions button{
+    background:none; border:none; padding:0;
+    font-size: 13px; color: var(--wine);
+    cursor:pointer; border-bottom: 1px solid transparent;
+  }
+  .entry-actions button:hover{ border-bottom-color: var(--wine-soft); }
+  .entry-actions button.danger{ color: var(--ink-soft); }
+
+  .empty{
+    color: var(--ink-soft);
+    font-style: italic;
+    font-size: 15px;
+    padding: 10px 0;
+  }
+
+  .flourish{
+    text-align:center;
+    color: var(--rule);
+    margin: 56px 0 0;
+    font-size: 18px;
+    letter-spacing: 8px;
+  }
+
+  @media (max-width: 760px){
+    .spread{
+      grid-template-columns: 1fr;
+    }
+    .spine{ display:none; }
+    h2.section-title{ margin-top: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    li.entry{ animation: none; }
+  }
+
+  :focus-visible{
+    outline: 2px solid var(--wine-soft);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <h1>Catatan Bersama</h1>
+      <div class="meta">
+        <span class="room-code" title="Kode room">XK9-2P4</span>
+        <span class="status" id="statusPill">
+          <span class="dot"></span>
+          <span id="statusLabel">Tersambung</span>
+        </span>
+      </div>
+    </header>
+
+    <div class="spread">
+      <section aria-label="Tulis catatan baru">
+        <h2 class="section-title">Tulis</h2>
+        <textarea id="composer" placeholder="Tempel atau ketik sesuatu di sini…"></textarea>
+        <div class="compose-foot">
+          <span class="char-count" id="charCount">0 karakter</span>
+          <button class="send" id="sendBtn">Kirim</button>
+        </div>
+        <div class="device-picker">
+          <label><input type="radio" name="device" value="hp"> dari HP</label>
+          <label><input type="radio" name="device" value="laptop" checked> dari laptop</label>
+        </div>
+      </section>
+
+      <div class="spine" aria-hidden="true"></div>
+
+      <section aria-label="Riwayat catatan">
+        <h2 class="section-title">Riwayat <span class="count" id="historyCount">(3)</span></h2>
+        <ul class="history" id="historyList"></ul>
+      </section>
+    </div>
+
+    <div class="flourish" aria-hidden="true">⁂</div>
+  </div>
+
+<script>
+  const composer = document.getElementById('composer');
+  const sendBtn = document.getElementById('sendBtn');
+  const charCount = document.getElementById('charCount');
+  const historyList = document.getElementById('historyList');
+  const historyCount = document.getElementById('historyCount');
+
+  // Data contoh — di app sungguhan, ini datang dari Firestore onSnapshot()
+  let entries = [
+    { text: "npm run build gagal karena env var NEXT_PUBLIC_API_URL kosong, cek .env.local", device: "laptop", time: "5 menit lalu" },
+    { text: "Ide: tambahin fitur pin buat catatan penting biar gak ke-auto-hapus", device: "hp", time: "1 jam lalu" },
+    { text: "Prompt: buatkan komponen tabel dengan sorting dan pagination, pakai vanilla JS", device: "hp", time: "kemarin" },
+  ];
+
+  function render(){
+    historyCount.textContent = `(${entries.length})`;
+    historyList.innerHTML = '';
+    if(entries.length === 0){
+      historyList.innerHTML = '<li class="empty">Belum ada catatan. Tulis sesuatu di sebelah kiri.</li>';
+      return;
+    }
+    entries.forEach((e, i) => {
+      const li = document.createElement('li');
+      li.className = 'entry';
+      li.innerHTML = `
+        <div class="entry-top">
+          <span class="from">dari ${e.device}</span>
+          <span>${e.time}</span>
+        </div>
+        <p class="entry-text"></p>
+        <div class="entry-actions">
+          <button data-action="copy" data-i="${i}">Salin</button>
+          <button data-action="delete" data-i="${i}" class="danger">Hapus</button>
+        </div>
+      `;
+      li.querySelector('.entry-text').textContent = e.text; // aman dari HTML injection
+      historyList.appendChild(li);
+    });
+  }
+
+  composer.addEventListener('input', () => {
+    charCount.textContent = `${composer.value.length} karakter`;
+  });
+
+  sendBtn.addEventListener('click', () => {
+    const text = composer.value.trim();
+    if(!text) return;
+    const device = document.querySelector('input[name="device"]:checked').value === 'hp' ? 'HP' : 'laptop';
+    entries.unshift({ text, device, time: 'baru saja' });
+    composer.value = '';
+    charCount.textContent = '0 karakter';
+    render();
+  });
+
+  historyList.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('button');
+    if(!btn) return;
+    const i = Number(btn.dataset.i);
+    if(btn.dataset.action === 'copy'){
+      navigator.clipboard?.writeText(entries[i].text);
+      btn.textContent = 'Tersalin';
+      setTimeout(() => { btn.textContent = 'Salin'; }, 1200);
+    }
+    if(btn.dataset.action === 'delete'){
+      entries.splice(i, 1);
+      render();
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>

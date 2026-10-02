@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Catatan Bersama</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#7A2430">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <h1>Catatan Bersama</h1>
+      <div class="meta">
+        <span class="room-code" id="roomCode" title="Klik untuk salin kode room"></span>
+        <span class="status" id="statusPill" role="status" aria-live="polite">
+          <span class="dot"></span>
+          <span id="statusLabel">Tersambung</span>
+        </span>
+        <button class="change-room" id="changeRoomBtn" title="Keluar dari room ini">Ganti Room</button>
+      </div>
+    </header>
+
+    <div class="spread">
+      <section aria-label="Tulis catatan baru">
+        <h2 class="section-title">Tulis</h2>
+        <textarea id="composer" placeholder="Tempel atau ketik sesuatu di sini…"></textarea>
+        <div class="compose-foot">
+          <span class="char-count" id="charCount">0 karakter</span>
+          <button class="send" id="sendBtn">Kirim</button>
+        </div>
+        <div class="device-picker">
+          <label><input type="radio" name="device" value="HP"> dari HP</label>
+          <label><input type="radio" name="device" value="laptop"> dari laptop</label>
+        </div>
+      </section>
+
+      <div class="spine" aria-hidden="true"></div>
+
+      <section aria-label="Riwayat catatan">
+        <h2 class="section-title">Riwayat <span class="count" id="historyCount">(0)</span></h2>
+        <ul class="history" id="historyList"></ul>
+        <div class="load-more-wrap">
+          <button class="load-more" id="loadMoreBtn" style="display:none">Muat lebih banyak</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="flourish" aria-hidden="true">⁂</div>
+  </div>
+
+<script src="/vendor/firebase-app-compat.js"></script>
+<script src="/vendor/firebase-firestore-compat.js"></script>
+<script src="/js/firebase-init.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/room.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+</body>
+</html>

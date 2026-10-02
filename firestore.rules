@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Kode room valid: 6 karakter alfanumerik, tanpa dash
+    function validRoom(roomId) {
+      return roomId.matches('^[A-Za-z0-9]{6}$');
+    }
+
+    match /rooms/{roomId} {
+      // Baca: siapa pun yang tahu kode valid
+      allow read: if validRoom(roomId);
+
+      // Create: field valid + createdAt recent (cegah backdating)
+      allow create: if validRoom(roomId)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.lastActive is timestamp
+        && request.resource.data.createdAt >= request.time - duration.value(5, 'm')
+        && request.resource.data.createdAt <= request.time + duration.value(5, 'm');
+
+      // Update: hanya lastActive (heartbeat) — createdAt tidak boleh berubah
+      allow update: if validRoom(roomId)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastActive is timestamp;
+
+      // Room gak bisa dihapus dari klien
+      allow delete: if false;
+
+      match /clips/{clipId} {
+        allow read: if validRoom(roomId);
+
+        // Create: validasi penuh data clip
+        allow create: if validRoom(roomId)
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 10000
+          && request.resource.data.device is string
+          && request.resource.data.device.size() <= 30
+          && request.resource.data.pinned is bool
+          && request.resource.data.createdAt is timestamp
+          && request.resource.data.createdAt >= request.time - duration.value(5, 'm')
+          && request.resource.data.createdAt <= request.time + duration.value(5, 'm');
+
+        // Update: hanya toggle pin — text/createdAt/device tidak boleh berubah
+        allow update: if validRoom(roomId)
+          && request.resource.data.pinned is bool
+          && request.resource.data.text == resource.data.text
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.device == resource.data.device;
+
+        // Delete: fitur Hapus + auto-expire
+        allow delete: if validRoom(roomId);
+      }
+    }
+  }
+}
