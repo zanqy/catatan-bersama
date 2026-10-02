@@ -2,19 +2,38 @@
 
 > Satu buku catatan, dua tangan menulisnya — sinkron teks real-time dua arah antara HP dan laptop, tanpa login.
 
-**Live:** https://catatan-bersama-app.web.app
+![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Hosting-FFCA28?logo=firebase&logoColor=black)
+![PWA](https://img.shields.io/badge/PWA-Installable-5A0FC8?logo=pwa&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)
+![Status](https://img.shields.io/badge/status-live-success)
+
+**Live app:** https://catatan-bersama-app.web.app
+
+---
+
+## Tentang
+
+Prompt dan teks sering diambil dari HP, lalu dipakai ngoding di laptop. Transfer manual lewat chat atau email itu ribet. Catatan Bersama menyelesaikannya dengan satu tempat sinkron real-time, dua arah, dan gratis — cukup satu kode room untuk menyambungkan semua device.
 
 ## Fitur
 
-- Tempel/ketik teks → tersimpan otomatis ke Firestore
-- Sinkron real-time dua arah (`onSnapshot`, bukan polling)
-- Riwayat catatan (urut terbaru di atas, 50 per batch + load more)
-- Tombol **Copy** / **Hapus** per catatan
-- Pairing pakai kode room 6 karakter (generate + input manual)
-- **QR code pairing**: generate di laptop, scan di HP (Google Lens / kamera bawaan / scanner in-app)
-- Indikator status koneksi (online / offline / syncing)
-- Tampilan responsif (HP + laptop)
-- PWA — "Add to Home Screen" di HP tanpa publish ke Play Store
+| Fitur | Keterangan |
+|-------|------------|
+| Sinkron real-time | Dua arah via `onSnapshot`, bukan polling |
+| Riwayat catatan | Urut terbaru di atas, 50 per batch + load more |
+| Copy / Hapus | Sekali klik per catatan |
+| Pairing kode room | 6 karakter alfanumerik, acak kriptografis |
+| QR pairing | Generate di laptop, scan di HP (Google Lens, kamera bawaan, atau scanner in-app) |
+| Indikator koneksi | Online / offline / syncing |
+| Responsif | Nyaman di layar HP maupun laptop |
+| PWA | Add to Home Screen tanpa publish ke Play Store |
+
+## Cara Kerja
+
+1. Buka app di laptop, klik **Buat ruang baru** — muncul kode 6 karakter beserta QR code
+2. Di HP, masuk lewat tiga cara: scan QR dengan Google Lens atau kamera bawaan, scan QR lewat tombol **Scan QR** di dalam app, atau ketik kode manual
+3. Kode tersimpan di `localStorage` tiap device — tidak perlu input ulang
+4. Tempel teks di device mana pun, langsung muncul di device lain secara real-time
 
 ## Tech Stack
 
@@ -23,13 +42,13 @@
 | Database | Firebase Firestore (real-time listener) |
 | Hosting | Firebase Hosting |
 | PWA | `manifest.json` + service worker |
-| Frontend | Vanilla JS / HTML / CSS (tanpa framework) |
-| QR | `qrcodejs` (generate) + `jsQR` (scan) — self-host di `public/vendor/` |
+| Frontend | Vanilla JS / HTML / CSS, tanpa framework |
+| QR | `qrcodejs` (generate) + `jsQR` (scan), self-host di `public/vendor/` |
 
 ## Model Data
 
 ```
-rooms/{roomId}                    // roomId = 6 karakter, e.g. "XK92P4"
+rooms/{roomId}                    // roomId = 6 karakter, contoh "XK92P4"
   ├── createdAt: timestamp
   ├── lastActive: timestamp
   └── clips/{clipId}              // clipId = auto ID Firestore
@@ -39,35 +58,39 @@ rooms/{roomId}                    // roomId = 6 karakter, e.g. "XK92P4"
         └── pinned: boolean
 ```
 
-## Struktur
+## Struktur Proyek
 
 ```
-├── firebase.json            ← config Hosting + Firestore + emulator
-├── firestore.rules          ← security rules (wajib)
-├── firestore.indexes.json   ← composite index
-├── public/                  ← root hosting
-│   ├── index.html           ← landing (buat/gabung room + QR)
-│   ├── room.html            ← halaman room (composer + riwayat)
-│   ├── css/style.css        ← design system
-│   ├── js/                  ← firebase-init, utils, home, room
-│   ├── vendor/              ← SDK Firebase + library QR (self-host)
-│   ├── manifest.json        ← PWA manifest
-│   └── sw.js                ← service worker
-├── scripts/                 ← util: gen icons, tes rules (emulator)
-└── plans/rencana-teknis.md  ← rencana teknis
+├── firebase.json            # config Hosting + Firestore + emulator
+├── firestore.rules          # security rules
+├── firestore.indexes.json   # composite index
+├── public/                  # root hosting
+│   ├── index.html           # landing: buat/gabung room + QR
+│   ├── room.html            # halaman room: composer + riwayat
+│   ├── css/style.css        # design system
+│   ├── js/                  # firebase-init, utils, home, room
+│   ├── vendor/              # SDK Firebase + library QR (self-host)
+│   ├── manifest.json        # PWA manifest
+│   └── sw.js                # service worker
+├── scripts/                 # util: generate icon, tes rules via emulator
+└── plans/rencana-teknis.md  # rencana teknis
 ```
 
-## Setup Lokal
+## Menjalankan Lokal
 
-1. **Isi config Firebase** di `public/js/firebase-init.js` (nilai publik dari Firebase Console → Project settings → Your apps → Web app)
-2. **Tes lokal** (emulator Firestore + hosting):
-   ```bash
-   firebase emulators:start
-   ```
-3. **Tes security rules** via emulator:
-   ```bash
-   node scripts/test-rules-emulator.js
-   ```
+1. Isi config Firebase di `public/js/firebase-init.js` — ambil dari Firebase Console, menu Project settings, Your apps, Web app. Nilai config ini bersifat publik; keamanan data dijaga oleh security rules.
+
+2. Jalankan emulator untuk tes lokal:
+
+```bash
+firebase emulators:start
+```
+
+3. Tes security rules via emulator:
+
+```bash
+node scripts/test-rules-emulator.js
+```
 
 ## Deploy
 
@@ -75,12 +98,29 @@ rooms/{roomId}                    // roomId = 6 karakter, e.g. "XK92P4"
 firebase deploy
 ```
 
-Catatan: bump `VERSION` di `public/sw.js` saat ada update biar cache PWA ter-invalidate.
+Saat ada update, naikkan nilai `VERSION` di `public/sw.js` agar cache PWA ter-invalidate.
 
 ## Keamanan
 
-- Firestore Security Rules: baca/tulis cuma kalau tahu `roomId` valid (6 karakter alfanumerik)
-- Batasi ukuran teks (10.000 karakter) + recency check `createdAt`
-- Update clip cuma `pinned` (teks gak bisa diubah post-hoc)
-- Kode room acak kriptografis (`crypto.getRandomValues`)
-- Data gak dienkripsi end-to-end di v1 (cukup buat prompt/teks kerja biasa)
+- Baca/tulis hanya diizinkan jika tahu `roomId` yang valid (6 karakter alfanumerik)
+- Batas ukuran teks 10.000 karakter + recency check `createdAt` untuk mencegah spam
+- Update clip hanya pada field `pinned` — teks tidak bisa diubah setelah terkirim
+- Kode room dibuat dengan `crypto.getRandomValues`, bukan `Math.random()`
+- Data tidak dienkripsi end-to-end di v1 — cukup untuk prompt dan teks kerja biasa
+
+## Roadmap
+
+**v1.5**
+
+- Pin catatan penting agar tidak ter-auto-hapus
+- Auto-expire catatan lama (7 hari, kecuali yang di-pin)
+- Search/filter di riwayat
+- Dark mode
+- Label device custom
+
+**v2**
+
+- Kirim file via Firebase Storage
+- Preview gambar di riwayat
+- Multi-room (pisah kerjaan vs pribadi)
+- Share room ke device ketiga
